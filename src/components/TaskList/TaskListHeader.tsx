@@ -11,7 +11,7 @@ export const TaskListHeader = () => {
         <h1 className="text-white text-4xl font-bold">My Coach</h1>
       </div>
       <button 
-        onClick={() => navigate('create')}
+        onClick={() => navigate('/chat')}
         className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
       >
         <Plus className="w-6 h-6 text-white" />

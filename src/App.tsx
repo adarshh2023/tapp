@@ -7,6 +7,7 @@ import OtpVerification from './components/OtpVerification';
 import ProjectList from './components/ProjectList';
 import CreateProject from './components/CreateProject';
 import TaskList from './components/TaskList/TaskList';
+import ChatScreen from './components/ChatScreen';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
@@ -42,6 +43,14 @@ function App() {
             element={
               <PrivateRoute>
                 <TaskList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <PrivateRoute>
+                <ChatScreen />
               </PrivateRoute>
             }
           />

@@ -3,11 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Input } from './ui/Input';
-import { Select } from './ui/Select';
+import { StatusDropdown } from './ui/StatusDropdown';
+import { MemberDropdown } from './ui/MemberDropdown';
 import { Button } from './ui/Button';
-import { MemberSelect } from './ui/MemberSelect';
 import { getUserProfile, getCompanyUsers, createProject } from '../services/api';
 import { User } from '../types/user';
+
+interface Member {
+  userId: string;
+  role: string;
+}
 
 export default function CreateProject() {
   const navigate = useNavigate();
@@ -15,7 +20,7 @@ export default function CreateProject() {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('active');
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedMembers, setSelectedMembers] = useState<Map<string, string>>(new Map());
+  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -32,23 +37,9 @@ export default function CreateProject() {
     fetchUsers();
   }, []);
 
-  const handleMemberSelect = (userId: string, selected: boolean) => {
-    const newMembers = new Map(selectedMembers);
-    if (selected) {
-      newMembers.set(userId, 'viewer');
-    } else {
-      newMembers.delete(userId);
-    }
-    setSelectedMembers(newMembers);
-  };
-
-  const handleRoleChange = (userId: string, role: string) => {
-    setSelectedMembers(new Map(selectedMembers.set(userId, role)));
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (selectedMembers.size === 0) {
+    if (selectedMembers.length === 0) {
       toast.error('Please select at least one member');
       return;
     }
@@ -56,15 +47,10 @@ export default function CreateProject() {
     setLoading(true);
     try {
       const profile = await getUserProfile();
-      const members = Array.from(selectedMembers.entries()).map(([userId, role]) => ({
-        userId,
-        role,
-      }));
-
       await createProject({
         name,
         description,
-        members,
+        members: selectedMembers,
         ownerId: profile._id,
         status,
       });
@@ -83,7 +69,7 @@ export default function CreateProject() {
       <div className="max-w-md mx-auto">
         <button
           onClick={() => navigate('/projects')}
-          className="text-white mb-6 flex items-center"
+          className="text-white mb-6 flex items-center hover:text-gray-300 transition-colors"
         >
           <ArrowLeft className="w-6 h-6 mr-2" />
           Back to Projects
@@ -108,31 +94,22 @@ export default function CreateProject() {
             required
           />
 
-          <Select
+          <StatusDropdown
             label="Status"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={setStatus}
             options={[
               { value: 'active', label: 'Active' },
-              { value: 'inactive', label: 'Inactive' },
+              { value: 'inactive', label: 'Inactive' }
             ]}
           />
 
-          <div className="space-y-2">
-            <label className="text-white text-lg">Members</label>
-            <div className="space-y-3">
-              {users.map((user) => (
-                <MemberSelect
-                  key={user._id}
-                  user={user}
-                  selected={selectedMembers.has(user._id)}
-                  role={selectedMembers.get(user._id) || 'viewer'}
-                  onSelect={(selected) => handleMemberSelect(user._id, selected)}
-                  onRoleChange={(role) => handleRoleChange(user._id, role)}
-                />
-              ))}
-            </div>
-          </div>
+          <MemberDropdown
+            label="Members"
+            users={users}
+            selectedMembers={selectedMembers}
+            onChange={setSelectedMembers}
+          />
 
           <Button type="submit" disabled={loading}>
             {loading ? 'Creating...' : 'Create Project'}

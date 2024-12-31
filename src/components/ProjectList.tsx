@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { getProjects } from '../services/api';
+import { getProjects, getUserProfile } from '../services/api';
 import { Project } from '../types/auth';
+import { UserProfile } from '../types/user';
 import { FilterButton } from './ui/FilterButton';
 import { ProjectCard } from './ui/ProjectCard';
 import { BottomNav } from './ui/BottomNav';
@@ -14,19 +15,26 @@ export default function ProjectList() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeFilter, setActiveFilter] = useState<Filter>('All');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getProjects();
-        setProjects(data);
+        const [projectsData, profile] = await Promise.all([
+          getProjects(),
+          getUserProfile()
+        ]);
+        setProjects(projectsData);
+        setUserProfile(profile);
       } catch (error: any) {
-        toast.error(error.response?.data?.message || 'Failed to fetch projects');
+        toast.error(error.response?.data?.message || 'Failed to fetch data');
       }
     };
 
-    fetchProjects();
+    fetchData();
   }, []);
+
+  const isAdmin = userProfile?.roles.includes('admin');
 
   const filteredProjects = projects.filter(project => {
     switch (activeFilter) {
@@ -44,12 +52,14 @@ export default function ProjectList() {
       <div className="p-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-white text-4xl font-bold">Projects</h1>
-          <button 
-            onClick={() => navigate('/projects/create')}
-            className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center"
-          >
-            <Plus className="w-6 h-6 text-white" />
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => navigate('/projects/create')}
+              className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+            >
+              <Plus className="w-6 h-6 text-white" />
+            </button>
+          )}
         </div>
 
         <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">

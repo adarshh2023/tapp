@@ -6,6 +6,7 @@ import PhoneLogin from './components/PhoneLogin';
 import OtpVerification from './components/OtpVerification';
 import ProjectList from './components/ProjectList';
 import CreateProject from './components/CreateProject';
+import TaskList from './components/TaskList/TaskList';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
@@ -33,6 +34,14 @@ function App() {
             element={
               <PrivateRoute>
                 <CreateProject />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/projects/:projectId/tasks"
+            element={
+              <PrivateRoute>
+                <TaskList />
               </PrivateRoute>
             }
           />

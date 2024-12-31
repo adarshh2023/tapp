@@ -47,7 +47,7 @@ function App() {
             }
           />
           <Route
-            path="/chat"
+            path="/projects/:projectId/chat"
             element={
               <PrivateRoute>
                 <ChatScreen />

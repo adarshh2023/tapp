@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 import { ChatHeader } from './chat/ChatHeader';
 import { ChatInput } from './chat/ChatInput';
 import { MessageList } from './chat/MessageList';
@@ -7,6 +8,7 @@ import { generateChatRoomKey, sendChatMessage } from '../services/chatService';
 import toast from 'react-hot-toast';
 
 export default function ChatScreen() {
+  const { projectId } = useParams<{ projectId: string }>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [chatId, setChatId] = useState<string>('');
@@ -56,7 +58,8 @@ export default function ChatScreen() {
   };
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    console.log(inputMessage);
+    if (!inputMessage.trim() || !projectId) return;
 
     const newUserMessage: Message = {
       type: 'user',
@@ -69,7 +72,7 @@ export default function ChatScreen() {
 
     try {
       const assistantMessage = await sendChatMessage(
-        "676d0fbe098d242d2d691895",
+        projectId,
         inputMessage,
         chatId
       );
@@ -91,9 +94,13 @@ export default function ChatScreen() {
     }
   };
 
-  const handleAssigneeSelect = async (assigneeId: string) => {
+  const handleAssigneeSelect = (assigneeId: string) => {
     setAssignees([]);
-    await handleSendMessage();
+    console.log("Assignee selected");
+    console.log(assigneeId);
+    console.log(typeof assigneeId);
+    setInputMessage(assigneeId);
+    handleSendMessage();
   };
 
   return (

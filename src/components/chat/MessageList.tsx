@@ -20,9 +20,14 @@ export function MessageList({
   onAssigneeSelect,
   messagesEndRef 
 }: MessageListProps) {
+  // Filter out the last message if showing assignees
+  const displayMessages = assignees.length > 0 
+    ? messages.slice(0, -1) 
+    : messages;
+
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-      {messages.map((message, index) => (
+      {displayMessages.map((message, index) => (
         <MessageBubble key={index} message={message} />
       ))}
 

@@ -14,6 +14,7 @@ export default function ChatScreen() {
   const [chatId, setChatId] = useState<string>('');
   const [assignees, setAssignees] = useState<AssigneeCard[]>([]);
   const [taskDetails, setTaskDetails] = useState<TaskDetails | null>(null);
+  const [selectedAssignee, setSelectedAssignee] = useState<AssigneeCard | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,29 +58,30 @@ export default function ChatScreen() {
     }
   };
 
-  const handleSendMessage = async () => {
-    console.log(inputMessage);
-    if (!inputMessage.trim() || !projectId) return;
+  const handleSendMessage = async (message: string) => {
+    if (!message.trim() || !projectId) return;
 
     const newUserMessage: Message = {
       type: 'user',
-      content: inputMessage,
+      content: message,
       timestamp: new Date(),
     };
 
     setMessages(prev => [...prev, newUserMessage]);
     setInputMessage('');
+    setSelectedAssignee(null);
 
     try {
       const assistantMessage = await sendChatMessage(
         projectId,
-        inputMessage,
+        message,
         chatId
       );
       
       if (assistantMessage.includes("Please select the assignee") || 
           assistantMessage.includes("Multiple users are available with")) {
-        setAssignees(parseAssignees(assistantMessage));
+        const parsedAssignees = parseAssignees(assistantMessage);
+        setAssignees(parsedAssignees);
       } else if (assistantMessage.includes("The task has been created with the following details")) {
         setTaskDetails(parseTaskDetails(assistantMessage));
       }
@@ -95,9 +97,22 @@ export default function ChatScreen() {
   };
 
   const handleAssigneeSelect = (assigneeId: string) => {
-    setAssignees([]);
-    setInputMessage(assigneeId);
-    handleSendMessage();
+    const selectedAssignee = assignees.find(a => a._id === assigneeId);
+    if (selectedAssignee) {
+      setSelectedAssignee(selectedAssignee);
+      setAssignees([]);
+      handleSendMessage(assigneeId);
+    }
+  };
+
+  const getInputPlaceholder = () => {
+    if (assignees.length > 0) {
+      return "Please select an assignee above";
+    }
+    if (selectedAssignee) {
+      return `Assigning task to ${selectedAssignee.name}...`;
+    }
+    return "Message here!";
   };
 
   return (
@@ -113,7 +128,9 @@ export default function ChatScreen() {
       <ChatInput
         value={inputMessage}
         onChange={setInputMessage}
-        onSend={handleSendMessage}
+        onSend={() => handleSendMessage(inputMessage)}
+        disabled={assignees.length > 0}
+        placeholder={getInputPlaceholder()}
       />
     </div>
   );

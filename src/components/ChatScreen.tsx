@@ -96,9 +96,6 @@ export default function ChatScreen() {
 
   const handleAssigneeSelect = (assigneeId: string) => {
     setAssignees([]);
-    console.log("Assignee selected");
-    console.log(assigneeId);
-    console.log(typeof assigneeId);
     setInputMessage(assigneeId);
     handleSendMessage();
   };

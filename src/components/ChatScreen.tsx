@@ -5,6 +5,7 @@ import { ChatInput } from './chat/ChatInput';
 import { MessageList } from './chat/MessageList';
 import { Message, AssigneeCard, TaskDetails } from '../types/chat';
 import { generateChatRoomKey, sendChatMessage } from '../services/chatService';
+import { useProject } from '../hooks/useProject';
 import toast from 'react-hot-toast';
 
 export default function ChatScreen() {
@@ -16,6 +17,7 @@ export default function ChatScreen() {
   const [taskDetails, setTaskDetails] = useState<TaskDetails | null>(null);
   const [selectedAssignee, setSelectedAssignee] = useState<AssigneeCard | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { project } = useProject();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -83,7 +85,13 @@ export default function ChatScreen() {
         const parsedAssignees = parseAssignees(assistantMessage);
         setAssignees(parsedAssignees);
       } else if (assistantMessage.includes("The task has been created with the following details")) {
-        setTaskDetails(parseTaskDetails(assistantMessage));
+        const details = parseTaskDetails(assistantMessage);
+        if (details) {
+          setTaskDetails({
+            ...details,
+            title: details.title || project?.name || ''
+          });
+        }
       }
 
       setMessages(prev => [...prev, {
@@ -117,7 +125,7 @@ export default function ChatScreen() {
 
   return (
     <div className="flex flex-col h-screen bg-black text-white">
-      <ChatHeader />
+      <ChatHeader projectName={project?.name} />
       <MessageList
         messages={messages}
         assignees={assignees}

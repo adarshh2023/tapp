@@ -2,7 +2,11 @@ import React from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export function ChatHeader() {
+interface ChatHeaderProps {
+  projectName?: string;
+}
+
+export function ChatHeader({ projectName }: ChatHeaderProps) {
   const navigate = useNavigate();
   
   return (
@@ -12,7 +16,7 @@ export function ChatHeader() {
           <ArrowLeft className="w-6 h-6" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold">My Coach</h1>
+          <h1 className="text-2xl font-bold">{projectName || 'Create Task'}</h1>
           <p className="text-sm text-gray-400">Create a new task</p>
         </div>
       </div>

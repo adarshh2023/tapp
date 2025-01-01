@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Task } from '../../types/task';
 import { formatDate } from '../../utils/date';
 
@@ -7,6 +8,8 @@ interface TaskCardProps {
 }
 
 export const TaskCard = ({ task }: TaskCardProps) => {
+  const navigate = useNavigate();
+
   const getProgressColor = (status: Task['status']) => {
     switch (status) {
       case 'Completed':
@@ -44,7 +47,10 @@ export const TaskCard = ({ task }: TaskCardProps) => {
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="flex items-center space-x-4 p-4 bg-neutral-900 rounded-lg">
+    <div 
+      className="flex items-center space-x-4 p-4 bg-neutral-900 rounded-lg cursor-pointer hover:bg-neutral-800 transition-all"
+      onClick={() => navigate(`/chat/${task.chatId}`)}
+    >
       <div className="relative w-16 h-16 flex-shrink-0">
         <svg className="w-full h-full -rotate-90 transform">
           <circle

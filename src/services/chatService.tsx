@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5001/api/fine';
+const API_BASE_URL = '/api/fine';
 
 const getAuthHeader = () => {
   const token = localStorage.getItem('token');
@@ -30,4 +30,12 @@ export async function sendChatMessage(projectId: string, userMessage: string, ch
     getAuthHeader()
   );
   return response.data.assistantMessage;
+}
+
+export async function getChatHistory(chatId: string) {
+  const response = await axios.get(
+    `${API_BASE_URL}/${chatId}`,
+    getAuthHeader()
+  );
+  return response.data;
 }

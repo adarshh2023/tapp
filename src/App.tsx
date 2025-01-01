@@ -8,6 +8,7 @@ import ProjectList from './components/ProjectList';
 import CreateProject from './components/CreateProject';
 import TaskList from './components/TaskList/TaskList';
 import ChatScreen from './components/ChatScreen';
+import ChatHistory from './components/ChatHistory';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token');
@@ -51,6 +52,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ChatScreen />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/chat/:chatId"
+            element={
+              <PrivateRoute>
+                <ChatHistory />
               </PrivateRoute>
             }
           />

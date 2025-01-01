@@ -15,6 +15,7 @@ export default function TaskList() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeFilter, setActiveFilter] = useState<Filter>('All');
   const [loading, setLoading] = useState(true);
+  const userId = localStorage.getItem('userId');
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -37,10 +38,7 @@ export default function TaskList() {
     
     switch (activeFilter) {
       case 'Assigned to me':
-        console.log("---------------------------------");
-        // console.log(task.assigneeId);
-        
-        return task.assigneeId === localStorage.getItem('userId');
+        return userId && task.assigneeId === userId;
       case 'Due Today':
         return task.dueDate.split('T')[0] === today;
       case 'Upcoming':
